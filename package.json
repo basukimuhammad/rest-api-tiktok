@@ -18,6 +18,8 @@
     "@fastify/swagger-ui": "^1.7.0",
     "cheerio": "^1.0.0-rc.12",
     "puppeteer": "^21.0.0",
+    "chrome-aws-lambda": "^10.1.0",
+    "puppeteer-core": "^21.0.0",
     "@fastify/static": "^7.0.4",
     "axios": "^1.7.2",
     "fastify": "^4.27.0",
