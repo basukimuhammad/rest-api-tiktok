@@ -1,6 +1,6 @@
 import path from "path";
 import Fastify from "fastify";
-import { TiktokDownloader } from "./api/timeApi.js"; // Impor fungsi downloader
+const { TiktokDownloader } = require("./timeApi.js");
 
 const app = Fastify({ logger: true });
 
