@@ -1,5 +1,5 @@
-import cheerio from 'cheerio';
-import axios from 'axios';
+const cheerio = require("cheerio");
+const axios = require("axios");
 
 export async function TiktokDownloader(url) {
     try {
