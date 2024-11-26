@@ -1,13 +1,16 @@
-const path = require("path");
-const Fastify = require("fastify");
-const { TiktokDownloader } = require("./api/tiktok.js");
+import { fileURLToPath } from 'url';
+import path from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import Fastify from "fastify";
+import { TiktokDownloader } from "./api/timeApi.js"; // Impor fungsi downloader
 
 const app = Fastify({ logger: true });
 
 // Konfigurasi file statis (opsional)
 app.register(require("@fastify/static"), {
-    root: path.join(__dirname, "static"), // Folder 'static' berisi file statis
-    prefix: "/static/", // Prefix untuk akses file
+    root: path.join(__dirname, "static"),
+    prefix: "/static/",
 });
 
 // Endpoint utama
