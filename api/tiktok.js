@@ -1,5 +1,5 @@
-const cheerio = require("cheerio");
-const axios = require("axios");
+import cheerio from 'cheerio';
+import axios from 'axios';
 
 export async function TiktokDownloader(url) {
     try {
@@ -50,3 +50,5 @@ export async function TiktokDownloader(url) {
         throw new Error('Gagal mengunduh video: ' + error.message);
     }
 }
+
+module.exports = { TiktokDownloader };
