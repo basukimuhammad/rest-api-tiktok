@@ -1,5 +1,5 @@
-import path from "path";
-import Fastify from "fastify";
+const path = require("path");
+const Fastify = require("fastify");
 const { TiktokDownloader } = require("./api/tiktok.js");
 
 const app = Fastify({ logger: true });
