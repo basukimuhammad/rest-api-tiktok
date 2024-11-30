@@ -1,50 +1,46 @@
-import { fileURLToPath } from 'url';
-import path from 'path';
-const __dirname = path.dirname(__filename);
-import Fastify from "fastify";
-import { TiktokDownloader } from "./api/tiktok.js"; // Impor fungsi downloader
+const path = require("path");
+const Fastify = require("fastify");
+const { downloadTikTokVideo } = require("./api/tiktok.js"); // Ganti `tiktoks` dengan `downloadTikTokVideo`
 
 const app = Fastify({ logger: true });
 
-// Konfigurasi file statis (opsional)
-app.register(require("@fastify/static"), {
-    root: path.join(__dirname, "static"),
-    prefix: "/static/",
-});
-
 // Endpoint utama
 app.get("/", async (req, res) => {
-    res.send("Selamat datang di API TikTok Downloader! Gunakan /tiktok?url={link_video}");
+  res.send("Selamat datang di API TikTok Downloader! Gunakan /tiktok?url={url_tiktok}");
 });
 
 // Endpoint TikTok downloader
 app.get("/tiktok", async (req, res) => {
-    const videoUrl = req.query.url; // Ambil URL dari query parameter
+  const url = req.query.url; // Mendapatkan parameter `url`
 
-    if (!videoUrl) {
-        return res.status(400).send({
-            status: "error",
-            message: "URL video TikTok tidak ditemukan! Gunakan parameter ?url={link_video}",
-        });
-    }
+  if (!url) {
+    return res.status(400).send({
+      status: "error",
+      message: "Parameter URL tidak ditemukan! Gunakan ?url={url_tiktok}",
+    });
+  }
 
-    try {
-        const hasil = await TiktokDownloader(videoUrl); // Panggil fungsi downloader
-        res.send({
-            status: "success",
-            data: hasil,
-        });
-    } catch (error) {
-        res.status(500).send({
-            status: "error",
-            message: "Gagal mengunduh video. Coba lagi nanti.",
-            error: error.message,
-        });
-    }
+  try {
+    const result = await downloadTikTokVideo(url); // Memanggil fungsi downloadTikTokVideo
+    res.send({
+      status: "success",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Gagal mendapatkan video TikTok. Coba lagi nanti.",
+      error: error.message,
+    });
+  }
 });
 
-// Menentukan port server
+// Start the server
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server berjalan di: http://localhost:${port}`);
+app.listen(port, (err) => {
+  if (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+  console.log(`Server berjalan di: http://localhost:${port}`);
 });
