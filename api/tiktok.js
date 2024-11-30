@@ -1,54 +1,51 @@
-import cheerio from 'cheerio';
-import axios from 'axios';
+const axios = require("axios");
 
-export async function TiktokDownloader(url) {
+function downloadTikTokVideo(url) {
+  return new Promise(async (resolve, reject) => {
     try {
-        // Data POST ke ssstik.io
-        const data = new URLSearchParams({
-            'id': url,
-            'locale': 'id',
-            'tt': 'RFBiZ3Bi', // Token default
-        });
+      if (!url || !/^https:\/\/(www\.|vm\.|m\.)?tiktok\.com\//.test(url)) {
+        return reject("URL TikTok tidak valid. Masukkan URL yang benar.");
+      }
 
-        // Header untuk menyamarkan request sebagai browser asli
-        const headers = {
-            'HX-Request': true,
-            'HX-Trigger': '_gcaptcha_pt',
-            'HX-Target': 'target',
-            'HX-Current-URL': 'https://ssstik.io/id',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36',
-            'Referer': 'https://ssstik.io/id',
-        };
+      const response = await axios({
+        method: "POST",
+        url: "https://tikwm.com/api/",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "Cookie": "current_language=en",
+          "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36",
+        },
+        data: new URLSearchParams({
+          url, // Masukkan URL video TikTok
+          hd: 1, // Mendapatkan video dalam kualitas HD jika tersedia
+        }).toString(),
+      });
 
-        // Request POST ke ssstik.io
-        const response = await axios.post('https://ssstik.io/abc?url=dl', data, { headers });
-        const html = response.data;
-        const $ = cheerio.load(html);
+      const { data } = response;
+      if (!data || !data.data) {
+        return reject("Gagal mendapatkan data video. Coba lagi nanti.");
+      }
 
-        // Ekstraksi data dari halaman hasil
-        const author = $('#avatarAndTextUsual h2').text().trim();
-        const title = $('#avatarAndTextUsual p').text().trim();
-        const video = $('.result_overlay_buttons a.download_link').attr('href');
-        const audio = $('.result_overlay_buttons a.download_link.music').attr('href');
-        const imgLinks = [];
+      const videoData = data.data;
+      const result = {
+        title: videoData.title || "Tidak ada judul",
+        cover: videoData.cover || null, // URL thumbnail video
+        no_watermark: videoData.play || null, // URL video tanpa watermark
+        watermark: videoData.wmplay || null, // URL video dengan watermark
+        music: videoData.music || null, // URL musik dari video
+        author: {
+          username: videoData.author.name || "Tidak ada nama pengguna",
+          avatar: videoData.author.avatar || null, // URL avatar pengguna
+        },
+      };
 
-        // Jika ada gambar slide, simpan dalam array
-        $('img[data-splide-lazy]').each((index, element) => {
-            const imgLink = $(element).attr('data-splide-lazy');
-            imgLinks.push(imgLink);
-        });
-
-        return {
-            isSlide: !video, // Jika tidak ada video, berarti ini slide
-            author,
-            title,
-            result: video || imgLinks, // Video atau array gambar
-            audio,
-        };
+      resolve(result);
     } catch (error) {
-        throw new Error('Gagal mengunduh video: ' + error.message);
+      reject(`Error: ${error.message || "Gagal memproses permintaan."}`);
     }
+  });
 }
 
-module.exports = { TiktokDownloader };
+module.exports = {
+  downloadTikTokVideo,
+};
