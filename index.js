@@ -6,7 +6,7 @@ const app = Fastify({ logger: true });
 
 // Endpoint utama
 app.get("/", async (req, res) => {
-  res.send("Selamat datang di API TikTok Downloader! Gunakan /tiktok?url={url_tiktok}");
+  res.send("Selamat datang di API TikTok Downloader By Basuki! Gunakan /tiktok?url={url_tiktok}");
 });
 
 // Endpoint TikTok downloader
@@ -24,6 +24,7 @@ app.get("/tiktok", async (req, res) => {
     const result = await downloadTikTokVideo(url); // Memanggil fungsi downloadTikTokVideo
     res.send({
       status: "success",
+      creator: "Basuki",
       data: result,
     });
   } catch (error) {
